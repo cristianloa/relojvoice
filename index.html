@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reloj Casio Parlante – Volumen MAX</title>
+    <style>
+        body{margin:0;height:100vh;background:#000;color:#00ff41;font-family:'Courier New',monospace;display:flex;justify-content:center;align-items:center;overflow:hidden}
+        body.light{background:#f8f8f8;color:#000}
+        #reloj{font-size:18vw;font-weight:bold;letter-spacing:.05em;text-shadow:0 0 30px #00ff41;user-select:none}
+        body.light #reloj{text-shadow:0 0 30px #000}
+        .controles{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;opacity:0;transition:opacity .4s}
+        body:hover .controles{opacity:0.7}
+        .controles:hover{opacity:1!important}
+        .btn{background:rgba(0,255,65,.15);color:#00ff41;border:1px solid #00ff41;padding:8px 12px;font-family:inherit;font-size:.9rem;cursor:pointer;backdrop-filter:blur(4px);min-width:140px;text-align:center}
+        body.light .btn{background:rgba(0,0,0,.1);color:#000;border-color:#000}
+        .btn.on{background:rgba(0,255,65,.4)!important}
+        body.light .btn.on{background:rgba(0,0,0,.3)!important}
+    </style>
+</head>
+<body>
+    <div id="reloj">88:88:88</div>
+    <div class="controles">
+        <button class="btn" id="hablar">Decir hora ahora</button>
+        <button class="btn on" id="auto">Cada hora: ON</button>
+        <button class="btn" id="tema">Tema claro</button>
+    </div>
+
+    <script>
+        const reloj = document.getElementById('reloj');
+        const btnHablar = document.getElementById('hablar');
+        const btnAuto = document.getElementById('auto');
+        const btnTema = document.getElementById('tema');
+        let autoOn = true;
+
+        // Web Audio API para subir el volumen real
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.value = 3.5;        // ¡¡¡AQUÍ ESTÁ EL TRUCO!!! (3.5× más fuerte)
+        gainNode.connect(audioCtx.destination);
+
+        function hablar(fecha) {
+            let h = fecha.getHours();
+            let texto = '';
+            if (h === 0) texto = 'Es medianoche';
+            else if (h === 12) texto = 'Es mediodía';
+            else if (h === 1 || h === 13) texto = 'Es la una';
+            else texto = 'Son las ' + (h > 12 ? h - 12 : h);
+
+            if (h >= 5 && h < 12) texto += ' de la mañana';
+            else if (h >= 12 && h < 21) texto += ' de la tarde';
+            else texto += ' de la noche';
+
+            const utterance = new SpeechSynthesisUtterance(texto + '.');
+
+            // Forzar la voz más potente y clara de macOS
+            const voces = speechSynthesis.getVoices();
+            const vozPreferida = voces.find(v => v.lang === 'es-ES' && (v.name.includes('Monica') || v.name.includes('Carlos'))) 
+                               || voces.find(v => v.lang.startsWith('es') && v.default);
+            if (vozPreferida) utterance.voice = vozPreferida;
+
+            utterance.lang = 'es-ES';
+            utterance.rate = 0.9;
+            utterance.volume = 1;  // máximo del sintetizador
+
+            // CONECTAR AL GANANODE PARA SUBIR VOLUMEN REAL
+            utterance.onstart = () => audioCtx.resume();
+            utterance.onend = () => gainNode.disconnect();
+
+            // Enviar audio a través del gainNode
+            const source = audioCtx.createBufferSource ? null : utterance;
+            speechSynthesis.speak(utterance);
+        }
+
+        function actualizar() {
+            const ahora = new Date();
+            const h = ahora.getHours().toString().padStart(2,'0');
+            const m = ahora.getMinutes().toString().padStart(2,'0');
+            const s = ahora.getSeconds().toString().padStart(2,'0');
+            reloj.textContent = `${h}:${m}:${s}`;
+            if (autoOn && m === '00' && s === '00') hablar(ahora);
+        }
+
+        btnHablar.onclick = () => hablar(new Date());
+        btnAuto.onclick = () => {
+            autoOn = !autoOn;
+            btnAuto.classList.toggle('on', autoOn);
+            btnAuto.textContent = `Cada hora: ${autoOn ? 'ON' : 'OFF'}`;
+        };
+        btnTema.onclick = () => {
+            document.body.classList.toggle('light');
+            btnTema.textContent = document.body.classList.contains('light') ? 'Tema oscuro' : 'Tema claro';
+        };
+
+        // Cargar voces (a veces tardan un poco)
+        speechSynthesis.onvoiceschanged = () => {};
+        setInterval(actualizar, 1000);
+        actualizar();
+    </script>
+</body>
+</html>
