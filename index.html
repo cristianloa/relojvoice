@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Reloj Casio ÉPICO</title>
+    <title>Reloj Casio FINAL - 100% FUNCIONAL</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@flaticon/flaticon-uicons/css/all/all.css">
     <style>
         *{box-sizing:border-box;margin:0;padding:0}
         body{
@@ -21,18 +22,13 @@
         }
         @media (min-width:500px){#reloj{font-size:15vw}}
         @media (min-width:800px){#reloj{font-size:12vw}}
-        body.light #reloj{text-shadow:0 0 50px #000}
+        body.light #reloj{text-shadow:0 0 50px #000;color:#000}
 
         .digito{display:inline-block;width:0.59em;text-align:center}
         .puntos{display:inline-block;width:0.5em;text-align:center;animation:parpadeo 1s steps(2,start) infinite}
         @keyframes parpadeo{to{opacity:0}}
-
-        /* Parpadeo de alarma/temporizador terminado (5 veces) */
-        @keyframes flashColon {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-        .flash .puntos { animation: flashColon 0.4s ease-in-out 10 alternate; } /* 5 veces = 10 alternancias */
+        @keyframes flashColon{0%,100%{opacity:1}50%{opacity:0}}
+        .flash .puntos{animation:flashColon 0.4s ease-in-out 10 alternate}
 
         #secondary{
             margin-top:20px;font-size:5vw;font-weight:600;opacity:0.8;
@@ -40,20 +36,34 @@
         }
         @media (min-width:600px){#secondary{font-size:3.5vw}}
 
-        #themeBtn{position:fixed;top:20px;left:20px;z-index:100;font-size:2.8rem;cursor:pointer;padding:10px;border-radius:50%;background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);}
-        body.light #themeBtn{background:rgba(0,0,0,0.1)}
+        #themeBtn{
+            position:fixed;top:18px;left:18px;z-index:100;
+            font-size:1.8rem;cursor:pointer;
+            width:44px;height:44px;border-radius:50%;
+            background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);
+            display:flex;align-items:center;justify-content:center;
+            transition:all .3s;box-shadow:0 0 20px rgba(0,255,65,0.3);
+        }
+        body.light #themeBtn{background:rgba(0,0,0,0.12);box-shadow:0 0 20px rgba(0,0,0,0.3)}
 
-        #hamburger{position:fixed;top:20px;right:20px;z-index:100;width:50px;height:50px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;gap:6px;}
-        .bar{width:35px;height:5px;background:#00ff41;border-radius:3px;transition:all .3s}
+        #hamburger{
+            position:fixed;top:18px;right:18px;z-index:100;
+            width:44px;height:44px;display:flex;flex-direction:column;justify-content:center;align-items:center;
+            cursor:pointer;gap:5px;padding:8px;border-radius:50%;
+            background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);
+            box-shadow:0 0 20px rgba(0,255,65,0.3);
+        }
+        body.light #hamburger{background:rgba(0,0,0,0.12);box-shadow:0 0 20px rgba(0,0,0,0.3)}
+        .bar{width:26px;height:4px;background:#00ff41;border-radius:3px;transition:all .3s}
         body.light .bar{background:#000}
-        #hamburger.open .bar:nth-child(1){transform:rotate(45deg) translate(8px,8px)}
+        #hamburger.open .bar:nth-child(1){transform:rotate(45deg) translate(6px,6px)}
         #hamburger.open .bar:nth-child(2){opacity:0}
-        #hamburger.open .bar:nth-child(3){transform:rotate(-45deg) translate(8px,-8px)}
+        #hamburger.open .bar:nth-child(3){transform:rotate(-45deg) translate(6px,-6px)}
 
         #overlay{position:fixed;top:0;left:0;width:100%;height:100dvh;background:rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity .35s;z-index:98;}
         #overlay.open{opacity:1;pointer-events:all}
 
-        #sidebar{position:fixed;top:0;right:-100%;height:100dvh;background:rgba(0,0,0,0.98);padding:80px 30px 30px;overflow-y:auto;transition:right .35s ease;z-index:99;box-shadow:-10px 0 50px rgba(0,255,100,0.4);}
+        #sidebar{position:fixed;top:0;right:-100%;height:100dvh;background:rgba(0,0,0,0.98);padding:80px 30px 30px;overflow-y:auto;transition:right .35s ease;z-index:99;}
         body.light #sidebar{background:rgba(255,255,255,0.98);color:#000}
         @media (min-width:768px){#sidebar{width:50%;max-width:500px;right:-50%}#sidebar.open{right:0}}
         @media (max-width:767px){#sidebar{width:100%;right:-100%}#sidebar.open{right:0}}
@@ -65,8 +75,8 @@
 
         .btn{display:block;width:100%;margin:14px 0;padding:18px;background:rgba(0,255,65,.15);border:2px solid #00ff41;border-radius:12px;text-align:center;font-size:1.2rem;cursor:pointer;font-weight:600;transition:all .2s;}
         body.light .btn{background:rgba(0,0,0,.1);border-color:#000}
-        .btn.on,.btn.add{background:rgba(0,255,65,.7)!important;color:#000}
-        body.light .btn.on{background:rgba(0,0,0,.6)!important;color:#0f0}
+        .btn.add{background:rgba(0,255,65,.7)!important;color:#000}
+        body.light .btn.add{background:rgba(0,0,0,.6)!important;color:#0f0}
 
         .input-row{display:flex;gap:15px;align-items:center;justify-content:center;margin:20px 0}
         input[type=number]{width:90px;padding:16px;font-size:1.5rem;background:rgba(0,0,0,0.7);color:#0f0;border:2px solid #0f0;border-radius:12px;text-align:center;font-family:inherit;}
@@ -74,9 +84,6 @@
 
         .alarma-item{display:flex;justify-content:space-between;align-items:center;background:rgba(0,255,65,.1);padding:12px;margin:8px 0;border-radius:10px;font-size:1.2rem;}
         .alarma-item button{background:#f55;color:#fff;border:none;padding:8px 12px;border-radius:8px}
-
-        .pulse{animation:pulse 1.5s infinite}
-        @keyframes pulse{0%,100%{text-shadow:0 0 50px #00ff41}50%{text-shadow:0 0 120px #00ff41,0 0 200px #0f0}}
     </style>
 </head>
 <body>
@@ -91,7 +98,7 @@
 
 <div id="secondary"></div>
 
-<div id="themeBtn">🌒</div>
+<div id="themeBtn"><i class="fi fi-rr-moon-stars"></i></div>
 
 <div id="hamburger">
     <div class="bar"></div>
@@ -148,7 +155,67 @@
     let alarmas = [];
     let timerActivo = false, timerPausado = false, timerSegundosRestantes = 0, timerInterval = null;
 
-    // === TEMPORIZADOR CON PANTALLA GRANDE ===
+    // === CAMBIAR TEMA CON ICONO FLATICON ===
+    themeBtn.onclick = e => {
+        e.stopPropagation();
+        document.body.classList.toggle('light');
+        const icon = themeBtn.querySelector('i');
+        icon.className = document.body.classList.contains('light') ? 'fi fi-rr-sun' : 'fi fi-rr-moon-stars';
+    };
+
+    // === MENÚ HAMBURGUESA ===
+    function toggleMenu() {
+        hamburger.classList.toggle('open');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+    }
+    hamburger.onclick = e => { e.stopPropagation(); toggleMenu(); };
+    overlay.onclick = () => { if (sidebar.classList.contains('open')) toggleMenu(); };
+
+    // === DECIR LA HORA AL TOCAR LA PANTALLA ===
+    document.body.onclick = e => {
+        if (e.target.closest('#sidebar') || e.target.closest('#hamburger') || e.target.closest('#themeBtn')) return;
+        if (sidebar.classList.contains('open')) return;
+        const ahora = new Date();
+        const h = ahora.getHours();
+        const m = ahora.getMinutes();
+        hablar(`Son las ${h} y ${m}`);
+    };
+
+    // === AGREGAR Y ELIMINAR ALARMAS (FUNCIONA 100%) ===
+    document.getElementById('addAlarm').onclick = () => {
+        if (alarmas.length >= 3) {
+            alert("Máximo 3 alarmas");
+            return;
+        }
+        const h = parseInt(document.getElementById('newH').value) || 0;
+        const m = parseInt(document.getElementById('newM').value) || 0;
+        if (h < 0 || h > 23 || m < 0 || m > 59) {
+            alert("Hora inválida");
+            return;
+        }
+        alarmas.push({h, m, id: Date.now()});
+        renderAlarmas();
+        actualizarSecondary();
+    };
+
+    function renderAlarmas() {
+        listaAlarmas.innerHTML = '';
+        alarmas.forEach(a => {
+            const div = document.createElement('div');
+            div.className = 'alarma-item';
+            div.innerHTML = `Alarma ${a.h.toString().padStart(2,'0')}:${a.m.toString().padStart(2,'0')} 
+                <button onclick="eliminarAlarma(${a.id})">Eliminar</button>`;
+            listaAlarmas.appendChild(div);
+        });
+    }
+    window.eliminarAlarma = id => {
+        alarmas = alarmas.filter(a => a.id !== id);
+        renderAlarmas();
+        actualizarSecondary();
+    };
+
+    // === TEMPORIZADOR CON PANTALLA GRANDE Y PARPADEO ===
     document.getElementById('startTimer').onclick = () => {
         const h = parseInt(document.getElementById('timerH').value)||0;
         const m = parseInt(document.getElementById('timerM').value)||0;
@@ -167,35 +234,27 @@
             if (--timerSegundosRestantes <= 0) {
                 clearInterval(timerInterval);
                 timerActivo = false;
-
-                // EFECTO FINAL ÉPICO
                 secondary.textContent = "¡TERMINADO!";
                 secondary.style.fontSize = "7vw";
-                secondary.style.opacity = "1";
-                reloj.classList.add('flash'); // Activa el parpadeo de los :
-
+                reloj.classList.add('flash');
                 hablar("¡Temporizador terminado!");
-                if ("vibrate" in navigator) navigator.vibrate([1000, 500, 1000, 500, 1000]);
-
+                if ("vibrate" in navigator) navigator.vibrate([1000,500,1000,500,1000]);
                 setTimeout(() => {
                     reloj.classList.remove('flash');
                     secondary.textContent = "";
-                    secondary.style.fontSize = "5vw";
                     document.getElementById('startTimer').style.display = 'block';
                     document.getElementById('pauseTimer').style.display = 'none';
                     document.getElementById('cancelTimer').style.display = 'none';
                     actualizarSecondary();
-                }, 5000); // 5 segundos de celebración
+                }, 5000);
                 return;
             }
 
-            // Mostrar temporizador grande mientras corre
             const hh = Math.floor(timerSegundosRestantes/3600).toString().padStart(2,'0');
             const mm = Math.floor((timerSegundosRestantes%3600)/60).toString().padStart(2,'0');
             const ss = (timerSegundosRestantes%60).toString().padStart(2,'0');
             secondary.textContent = `${hh}:${mm}:${ss}`;
             secondary.style.fontSize = "7vw";
-            secondary.style.opacity = "0.9";
         }, 1000);
     };
 
@@ -214,34 +273,43 @@
         actualizarSecondary();
     };
 
-    // === ALARMAS (hasta 3) ===
-    document.getElementById('addAlarm').onclick = () => {
-        if (alarmas.length >= 3) return alert("Máximo 3 alarmas");
-        const h = parseInt(document.getElementById('newH').value) || 0;
-        const m = parseInt(document.getElementById('newM').value) || 0;
-        alarmas.push({h, m, id: Date.now()});
-        renderAlarmas();
-        actualizarSecondary();
-    };
+    // === RELOJ + ALARMAS + ACTUALIZAR PANTALLA ===
+    function actualizarReloj() {
+        const ahora = new Date();
+        let horas = es24h ? ahora.getHours() : (ahora.getHours() % 12 || 12);
+        const hh = horas.toString().padStart(2,'0');
+        const mm = ahora.getMinutes().toString().padStart(2,'0');
+        const ss = ahora.getSeconds().toString().padStart(2,'0');
 
-    function renderAlarmas() {
-        listaAlarmas.innerHTML = '';
+        h1.textContent = hh[0]; h2.textContent = hh[1];
+        m1.textContent = mm[0]; m2.textContent = mm[1];
+        s1.textContent = ss[0]; s2.textContent = ss[1];
+
+        // Cada hora
+        if (autoOn && mm === '00' && ss === '00') {
+            hablar(`Son las ${ahora.getHours()} en punto`);
+        }
+
+        // Alarmas
         alarmas.forEach(a => {
-            const div = document.createElement('div');
-            div.className = 'alarma-item';
-            div.innerHTML = `Alarma ${a.h.toString().padStart(2,'0')}:${a.m.toString().padStart(2,'0')} <button onclick="eliminarAlarma(${a.id})">Eliminar</button>`;
-            listaAlarmas.appendChild(div);
+            if (a.h === ahora.getHours() && a.m === ahora.getMinutes() && ahora.getSeconds() === 0) {
+                secondary.textContent = `¡ALARMA! ${a.h}:${a.m.toString().padStart(2,'0')}`;
+                secondary.style.fontSize = "7vw";
+                reloj.classList.add('flash');
+                hablar("¡Alarma!");
+                if ("vibrate" in navigator) navigator.vibrate([500,300,500]);
+                setTimeout(() => reloj.classList.remove('flash'), 5000);
+            }
         });
+
+        if (!timerActivo) actualizarSecondary();
     }
-    window.eliminarAlarma = id => {
-        alarmas = alarmas.filter(a => a.id !== id);
-        renderAlarmas();
-        actualizarSecondary();
-    };
 
     function actualizarSecondary() {
-        if (timerActivo) return;
-        if (alarmas.length === 0) { secondary.textContent = ''; return; }
+        if (timerActivo || alarmas.length === 0) {
+            if (!timerActivo) secondary.textContent = '';
+            return;
+        }
         const ahora = new Date();
         const actualMin = ahora.getHours() * 60 + ahora.getMinutes();
         let menorDiff = 1440;
@@ -253,60 +321,19 @@
         if (proxima && menorDiff < 1440) {
             const hh = Math.floor(menorDiff / 60).toString().padStart(2,'0');
             const mm = (menorDiff % 60).toString().padStart(2,'0');
-            secondary.textContent = `Alarma ${proxima.h}:${proxima.m.toString().padStart(2,'0')} en ${hh}:${mm}`;
-            secondary.style.fontSize = "5vw";
+            secondary.textContent = `Próxima: ${proxima.h}:${proxima.m.toString().padStart(2,'0')} en ${hh}:${mm}`;
+            secondary.style.fontSize = "4.5vw";
         }
-    }
-
-    // === RELOJ + ALARMAS ===
-    function actualizarReloj() {
-        const ahora = new Date();
-        let horas = ahora.getHours();
-        if (!es24h) horas = horas % 12 || 12;
-
-        const hh = horas.toString().padStart(2,'0');
-        const mm = ahora.getMinutes().toString().padStart(2,'0');
-        const ss = ahora.getSeconds().toString().padStart(2,'0');
-
-        h1.textContent = hh[0]; h2.textContent = hh[1];
-        m1.textContent = mm[0]; m2.textContent = mm[1];
-        s1.textContent = ss[0]; s2.textContent = ss[1];
-
-        if (autoOn && mm === '00' && ss === '00') hablar(`Son las ${ahora.getHours()} en punto`);
-
-        // Chequear alarmas
-        alarmas.forEach(a => {
-            if (a.h === ahora.getHours() && a.m === ahora.getMinutes() && ahora.getSeconds() === 0) {
-                secondary.textContent = `¡ALARMA! ${a.h}:${a.m.toString().padStart(2,'0')}`;
-                secondary.style.fontSize = "7vw";
-                reloj.classList.add('flash');
-                hablar("¡Alarma!");
-                if ("vibrate" in navigator) navigator.vibrate([500,300,500,300,500]);
-                setTimeout(() => reloj.classList.remove('flash'), 5000);
-            }
-        });
-
-        if (!timerActivo) actualizarSecondary();
     }
 
     function hablar(texto) {
         const u = new SpeechSynthesisUtterance(texto);
-        u.lang = 'es-ES'; u.rate = 0.9;
+        u.lang = 'es-ES';
+        u.rate = 0.9;
         speechSynthesis.speak(u);
     }
 
-    // UI
-    themeBtn.onclick = e => { e.stopPropagation(); document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light') ? '🌞' : '🌒'; };
-    function toggleMenu() { hamburger.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('open'); }
-    hamburger.onclick = e => { e.stopPropagation(); toggleMenu(); };
-    overlay.onclick = () => { if (sidebar.classList.contains('open')) toggleMenu(); };
-
-    document.body.onclick = e => {
-        if (!e.target.closest('#sidebar') && !e.target.closest('#hamburger') && !e.target.closest('#themeBtn') && !sidebar.classList.contains('open')) {
-            hablar(`Son las ${new Date().getHours()} y ${new Date().getMinutes()}`);
-        }
-    };
-
+    // Formato 24h/12h
     document.getElementById('formato').onclick = () => {
         es24h = !es24h;
         document.getElementById('formato').classList.toggle('on');
@@ -314,6 +341,13 @@
         actualizarReloj();
     };
 
+    document.getElementById('auto').onclick = () => {
+        autoOn = !autoOn;
+        document.getElementById('auto').classList.toggle('on');
+        document.getElementById('auto').textContent = `Cada hora: ${autoOn?'ON':'OFF'}`;
+    };
+
+    // INICIAR RELOJ
     setInterval(actualizarReloj, 1000);
     actualizarReloj();
     renderAlarmas();
