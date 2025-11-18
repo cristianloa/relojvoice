@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Reloj Casio FINAL - 100% FUNCIONAL</title>
+    <title>Reloj Casio PERFECTO - Voz 12h/24h Corregida</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@flaticon/flaticon-uicons/css/all/all.css">
     <style>
@@ -155,7 +155,40 @@
     let alarmas = [];
     let timerActivo = false, timerPausado = false, timerSegundosRestantes = 0, timerInterval = null;
 
-    // === CAMBIAR TEMA CON ICONO FLATICON ===
+    // === FUNCIÓN PARA DECIR LA HORA EN ESPAÑOL NATURAL (12h/24h) ===
+    function decirHora() {
+        const ahora = new Date();
+        const h24 = ahora.getHours();
+        const m = ahora.getMinutes();
+
+        let texto = "";
+
+        if (es24h) {
+            if (m === 0) texto = `Son las ${h24} en punto`;
+            else if (m === 1) texto = `Es la ${h24} y un minuto`;
+            else texto = `Son las ${h24} y ${m}`;
+        } else {
+            let h12 = h24 % 12 || 12;
+            let periodo = h24 < 12 ? "de la mañana" : h24 < 21 ? "de la tarde" : "de la noche";
+
+            if (h24 === 0 && m === 0) texto = "Es medianoche";
+            else if (h24 === 12 && m === 0) texto = "Es mediodía";
+            else if (m === 0) texto = h12 === 1 ? `Es la una en punto ${periodo}` : `Son las ${h12} en punto ${periodo}`;
+            else if (m === 1) texto = h12 === 1 ? `Es la una y un minuto ${periodo}` : `Son las ${h12} y un minuto ${periodo}`;
+            else texto = h12 === 1 ? `Es la una y ${m} ${periodo}` : `Son las ${h12} y ${m} ${periodo}`;
+        }
+
+        hablar(texto);
+    }
+
+    function hablar(texto) {
+        const u = new SpeechSynthesisUtterance(texto);
+        u.lang = 'es-ES';
+        u.rate = 0.9;
+        speechSynthesis.speak(u);
+    }
+
+    // === RESTO DEL CÓDIGO (todo igual, solo corregida la voz) ===
     themeBtn.onclick = e => {
         e.stopPropagation();
         document.body.classList.toggle('light');
@@ -163,7 +196,6 @@
         icon.className = document.body.classList.contains('light') ? 'fi fi-rr-sun' : 'fi fi-rr-moon-stars';
     };
 
-    // === MENÚ HAMBURGUESA ===
     function toggleMenu() {
         hamburger.classList.toggle('open');
         sidebar.classList.toggle('open');
@@ -172,28 +204,19 @@
     hamburger.onclick = e => { e.stopPropagation(); toggleMenu(); };
     overlay.onclick = () => { if (sidebar.classList.contains('open')) toggleMenu(); };
 
-    // === DECIR LA HORA AL TOCAR LA PANTALLA ===
     document.body.onclick = e => {
         if (e.target.closest('#sidebar') || e.target.closest('#hamburger') || e.target.closest('#themeBtn')) return;
         if (sidebar.classList.contains('open')) return;
-        const ahora = new Date();
-        const h = ahora.getHours();
-        const m = ahora.getMinutes();
-        hablar(`Son las ${h} y ${m}`);
+        decirHora();
     };
 
-    // === AGREGAR Y ELIMINAR ALARMAS (FUNCIONA 100%) ===
+    // Alarmas, temporizador, reloj... (todo igual que en la versión anterior)
+
     document.getElementById('addAlarm').onclick = () => {
-        if (alarmas.length >= 3) {
-            alert("Máximo 3 alarmas");
-            return;
-        }
+        if (alarmas.length >= 3) return alert("Máximo 3 alarmas");
         const h = parseInt(document.getElementById('newH').value) || 0;
         const m = parseInt(document.getElementById('newM').value) || 0;
-        if (h < 0 || h > 23 || m < 0 || m > 59) {
-            alert("Hora inválida");
-            return;
-        }
+        if (h < 0 || h > 23 || m < 0 || m > 59) return alert("Hora inválida");
         alarmas.push({h, m, id: Date.now()});
         renderAlarmas();
         actualizarSecondary();
@@ -215,7 +238,7 @@
         actualizarSecondary();
     };
 
-    // === TEMPORIZADOR CON PANTALLA GRANDE Y PARPADEO ===
+    // Temporizador (igual, con parpadeo y sonido)
     document.getElementById('startTimer').onclick = () => {
         const h = parseInt(document.getElementById('timerH').value)||0;
         const m = parseInt(document.getElementById('timerM').value)||0;
@@ -230,7 +253,6 @@
 
         timerInterval = setInterval(() => {
             if (timerPausado) return;
-
             if (--timerSegundosRestantes <= 0) {
                 clearInterval(timerInterval);
                 timerActivo = false;
@@ -249,7 +271,6 @@
                 }, 5000);
                 return;
             }
-
             const hh = Math.floor(timerSegundosRestantes/3600).toString().padStart(2,'0');
             const mm = Math.floor((timerSegundosRestantes%3600)/60).toString().padStart(2,'0');
             const ss = (timerSegundosRestantes%60).toString().padStart(2,'0');
@@ -273,7 +294,6 @@
         actualizarSecondary();
     };
 
-    // === RELOJ + ALARMAS + ACTUALIZAR PANTALLA ===
     function actualizarReloj() {
         const ahora = new Date();
         let horas = es24h ? ahora.getHours() : (ahora.getHours() % 12 || 12);
@@ -285,18 +305,15 @@
         m1.textContent = mm[0]; m2.textContent = mm[1];
         s1.textContent = ss[0]; s2.textContent = ss[1];
 
-        // Cada hora
-        if (autoOn && mm === '00' && ss === '00') {
-            hablar(`Son las ${ahora.getHours()} en punto`);
-        }
+        if (autoOn && mm === '00' && ss === '00') decirHora();
 
-        // Alarmas
         alarmas.forEach(a => {
             if (a.h === ahora.getHours() && a.m === ahora.getMinutes() && ahora.getSeconds() === 0) {
                 secondary.textContent = `¡ALARMA! ${a.h}:${a.m.toString().padStart(2,'0')}`;
                 secondary.style.fontSize = "7vw";
                 reloj.classList.add('flash');
-                hablar("¡Alarma!");
+                decirHora();
+                hablar("¡Despierta!");
                 if ("vibrate" in navigator) navigator.vibrate([500,300,500]);
                 setTimeout(() => reloj.classList.remove('flash'), 5000);
             }
@@ -312,8 +329,7 @@
         }
         const ahora = new Date();
         const actualMin = ahora.getHours() * 60 + ahora.getMinutes();
-        let menorDiff = 1440;
-        let proxima = null;
+        let menorDiff = 1440, proxima = null;
         alarmas.forEach(a => {
             const diff = (a.h * 60 + a.m - actualMin + 1440) % 1440;
             if (diff < menorDiff) { menorDiff = diff; proxima = a; }
@@ -321,19 +337,11 @@
         if (proxima && menorDiff < 1440) {
             const hh = Math.floor(menorDiff / 60).toString().padStart(2,'0');
             const mm = (menorDiff % 60).toString().padStart(2,'0');
-            secondary.textContent = `Próxima: ${proxima.h}:${proxima.m.toString().padStart(2,'0')} en ${hh}:${mm}`;
+            secondary.textContent = `Próxima: ${proxima.h.toString().padStart(2,'0')}:${proxima.m.toString().padStart(2,'0')} en ${hh}:${mm}`;
             secondary.style.fontSize = "4.5vw";
         }
     }
 
-    function hablar(texto) {
-        const u = new SpeechSynthesisUtterance(texto);
-        u.lang = 'es-ES';
-        u.rate = 0.9;
-        speechSynthesis.speak(u);
-    }
-
-    // Formato 24h/12h
     document.getElementById('formato').onclick = () => {
         es24h = !es24h;
         document.getElementById('formato').classList.toggle('on');
@@ -347,7 +355,6 @@
         document.getElementById('auto').textContent = `Cada hora: ${autoOn?'ON':'OFF'}`;
     };
 
-    // INICIAR RELOJ
     setInterval(actualizarReloj, 1000);
     actualizarReloj();
     renderAlarmas();
