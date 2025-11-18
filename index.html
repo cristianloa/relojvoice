@@ -3,99 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reloj Casio Parlante – Volumen MAX</title>
+    <title>Reloj JetBrains Mono – Minutos perfectos</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <style>
-        body{margin:0;height:100vh;background:#000;color:#00ff41;font-family:'Courier New',monospace;display:flex;justify-content:center;align-items:center;overflow:hidden}
+        body{margin:0;height:100vh;background:#000;color:#00ff41;font-family:'JetBrains Mono',monospace;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer}
         body.light{background:#f8f8f8;color:#000}
-        #reloj{font-size:18vw;font-weight:bold;letter-spacing:.05em;text-shadow:0 0 30px #00ff41;user-select:none}
-        body.light #reloj{text-shadow:0 0 30px #000}
-        .controles{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;opacity:0;transition:opacity .4s}
-        body:hover .controles{opacity:0.7}
-        .controles:hover{opacity:1!important}
-        .btn{background:rgba(0,255,65,.15);color:#00ff41;border:1px solid #00ff41;padding:8px 12px;font-family:inherit;font-size:.9rem;cursor:pointer;backdrop-filter:blur(4px);min-width:140px;text-align:center}
+        #reloj{font-size:16.8vw;font-weight:800;letter-spacing:0.07em;text-shadow:0 0 45px #00ff41;user-select:none}
+        body.light #reloj{text-shadow:0 0 45px #000}
+        .digito{display:inline-block;width:0.59em;text-align:center}
+        .puntos{display:inline-block;width:0.5em;text-align:center;animation:parpadeo 1s steps(2,start) infinite}
+        @keyframes parpadeo{to{opacity:0}}
+        .controles{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;opacity:0;transition:opacity .4s;z-index:10}
+        body:hover .controles{opacity:0.7}.controles:hover{opacity:1!important}
+        .btn{background:rgba(0,255,65,.15);color:#00ff41;border:1px solid #00ff41;padding:8px 12px;font-family:inherit;font-size:.9rem;cursor:pointer;backdrop-filter:blur(4px);min-width:160px;text-align:center}
         body.light .btn{background:rgba(0,0,0,.1);color:#000;border-color:#000}
-        .btn.on{background:rgba(0,255,65,.4)!important}
-        body.light .btn.on{background:rgba(0,0,0,.3)!important}
+        .btn.on{background:rgba(0,255,65,.45)!important}
+        body.light .btn.on{background:rgba(0,0,0,.35)!important}
     </style>
 </head>
 <body>
-    <div id="reloj">88:88:88</div>
-    <div class="controles">
-        <button class="btn" id="hablar">Decir hora ahora</button>
-        <button class="btn on" id="auto">Cada hora: ON</button>
-        <button class="btn" id="tema">Tema claro</button>
-    </div>
 
-    <script>
-        const reloj = document.getElementById('reloj');
-        const btnHablar = document.getElementById('hablar');
-        const btnAuto = document.getElementById('auto');
-        const btnTema = document.getElementById('tema');
-        let autoOn = true;
+<div id="reloj">
+    <span class="digito" id="h1">8</span><span class="digito" id="h2">8</span
+    ><span class="puntos">:</span
+    ><span class="digito" id="m1">8</span><span class="digito" id="m2">8</span
+    ><span class="puntos">:</span
+    ><span class="digito" id="s1">8</span><span class="digito" id="s2">8</span>
+</div>
 
-        // Web Audio API para subir el volumen real
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 3.5;        // ¡¡¡AQUÍ ESTÁ EL TRUCO!!! (3.5× más fuerte)
-        gainNode.connect(audioCtx.destination);
+<div class="controles">
+    <button class="btn on" id="auto">Cada hora: ON</button>
+    <button class="btn on" id="formato">Formato: 24h</button>
+    <button class="btn" id="tema">Tema claro</button>
+</div>
 
-        function hablar(fecha) {
-            let h = fecha.getHours();
-            let texto = '';
-            if (h === 0) texto = 'Es medianoche';
-            else if (h === 12) texto = 'Es mediodía';
-            else if (h === 1 || h === 13) texto = 'Es la una';
-            else texto = 'Son las ' + (h > 12 ? h - 12 : h);
+<script>
+    const h1 = document.getElementById('h1'), h2 = document.getElementById('h2');
+    const m1 = document.getElementById('m1'), m2 = document.getElementById('m2');
+    const s1 = document.getElementById('s1'), s2 = document.getElementById('s2');
 
-            if (h >= 5 && h < 12) texto += ' de la mañana';
-            else if (h >= 12 && h < 21) texto += ' de la tarde';
-            else texto += ' de la noche';
+    let es24h = true;
+    let autoOn = true;
 
-            const utterance = new SpeechSynthesisUtterance(texto + '.');
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const gainNode = audioCtx.createGain();
+    gainNode.gain.value = 4.5;
+    gainNode.connect(audioCtx.destination);
 
-            // Forzar la voz más potente y clara de macOS
-            const voces = speechSynthesis.getVoices();
-            const vozPreferida = voces.find(v => v.lang === 'es-ES' && (v.name.includes('Monica') || v.name.includes('Carlos'))) 
-                               || voces.find(v => v.lang.startsWith('es') && v.default);
-            if (vozPreferida) utterance.voice = vozPreferida;
+    // Números en palabras (perfecto español)
+    const unidades = ['cero', 'una', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve',
+                      'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve'];
+    const decenas = ['', 'diez', 'veinte', 'treinta', 'cuarenta', 'cincuenta'];
 
-            utterance.lang = 'es-ES';
-            utterance.rate = 0.9;
-            utterance.volume = 1;  // máximo del sintetizador
+    function numeroEnPalabras(n) {
+        if (n === 0) return 'cero';
+        if (n <= 19) return unidades[n];
+        if (n % 10 === 0) return decenas[n/10];
+        return decenas[Math.floor(n/10)] + ' y ' + unidades[n%10];
+    }
 
-            // CONECTAR AL GANANODE PARA SUBIR VOLUMEN REAL
-            utterance.onstart = () => audioCtx.resume();
-            utterance.onend = () => gainNode.disconnect();
+    function hablar(fecha) {
+        const h24 = fecha.getHours();
+        const min = fecha.getMinutes();
 
-            // Enviar audio a través del gainNode
-            const source = audioCtx.createBufferSource ? null : utterance;
-            speechSynthesis.speak(utterance);
+        let texto = '';
+
+        if (es24h) {
+            // Formato 24h
+            if (h24 === 0 && min === 0) texto = 'Son las cero en punto';
+            else if (min === 0) texto = 'Son las ' + numeroEnPalabras(h24) + ' en punto';
+            else texto = 'Son las ' + numeroEnPalabras(h24) + ' y ' + numeroEnPalabras(min) + (min === 1 ? ' minuto' : ' minutos');
+        } else {
+            // Formato 12h
+            let h12 = h24 % 12; if (h12 === 0) h12 = 12;
+            const periodo = h24 < 12 ? 'de la mañana' : h24 < 21 ? 'de la tarde' : 'de la noche';
+
+            if (h24 === 0 && min === 0) texto = 'Es medianoche';
+            else if (h24 === 12 && min === 0) texto = 'Es mediodía';
+            else {
+                const horaTexto = (h12 === 1 ? 'la una' : numeroEnPalabras(h12));
+                if (min === 0) texto = (h12 === 1 ? 'Es ' : 'Son las ') + horaTexto + ' en punto';
+                else texto = (h12 === 1 ? 'Es ' : 'Son las ') + horaTexto + ' y ' + numeroEnPalabras(min) + (min === 1 ? ' minuto' : ' minutos');
+                if (h24 !== 0 && h24 !== 12) texto += ' ' + periodo;
+            }
         }
 
-        function actualizar() {
-            const ahora = new Date();
-            const h = ahora.getHours().toString().padStart(2,'0');
-            const m = ahora.getMinutes().toString().padStart(2,'0');
-            const s = ahora.getSeconds().toString().padStart(2,'0');
-            reloj.textContent = `${h}:${m}:${s}`;
-            if (autoOn && m === '00' && s === '00') hablar(ahora);
+        texto += '.';
+
+        const u = new SpeechSynthesisUtterance(texto);
+        const voces = speechSynthesis.getVoices();
+        const voz = voces.find(v => v.lang === 'es-ES' && (v.name.includes('Monica') || v.name.includes('Carlos')))
+                 || voces.find(v => v.lang.startsWith('es'));
+        if (voz) u.voice = voz;
+        u.rate = 0.88;
+        u.onstart = () => audioCtx.resume();
+        speechSynthesis.speak(u);
+    }
+
+    function actualizar() {
+        const ahora = new Date();
+        const h24 = ahora.getHours();
+        const h = es24h ? h24 : (h24 % 12 || 12);
+        const hh = h.toString().padStart(2,'0');
+        const mm = ahora.getMinutes().toString().padStart(2,'0');
+        const ss = ahora.getSeconds().toString().padStart(2,'0');
+
+        h1.textContent = hh[0]; h2.textContent = hh[1];
+        m1.textContent = mm[0]; m2.textContent = mm[1];
+        s1.textContent = ss[0]; s2.textContent = ss[1];
+
+        if (autoOn && mm === '00' && ss === '00') hablar(ahora);
+    }
+
+    // Clic en cualquier parte = dice la hora
+    document.body.addEventListener('click', (e) => {
+        if (!e.target.closest('.controles')) {
+            hablar(new Date());
         }
+    });
 
-        btnHablar.onclick = () => hablar(new Date());
-        btnAuto.onclick = () => {
-            autoOn = !autoOn;
-            btnAuto.classList.toggle('on', autoOn);
-            btnAuto.textContent = `Cada hora: ${autoOn ? 'ON' : 'OFF'}`;
-        };
-        btnTema.onclick = () => {
-            document.body.classList.toggle('light');
-            btnTema.textContent = document.body.classList.contains('light') ? 'Tema oscuro' : 'Tema claro';
-        };
+    document.getElementById('auto').onclick = (e) => { e.stopPropagation(); autoOn = !autoOn;
+        const b = document.getElementById('auto'); b.classList.toggle('on', autoOn);
+        b.textContent = `Cada hora: ${autoOn?'ON':'OFF'}`;
+    };
 
-        // Cargar voces (a veces tardan un poco)
-        speechSynthesis.onvoiceschanged = () => {};
-        setInterval(actualizar, 1000);
+    document.getElementById('formato').onclick = (e) => { e.stopPropagation(); es24h = !es24h;
+        document.getElementById('formato').classList.toggle('on', es24h);
+        document.getElementById('formato').textContent = `Formato: ${es24h?'24h':'12h'}`;
         actualizar();
-    </script>
+    };
+
+    document.getElementById('tema').onclick = (e) => { e.stopPropagation();
+        document.body.classList.toggle('light');
+        document.getElementById('tema').textContent = document.body.classList.contains('light')?'Tema oscuro':'Tema claro';
+    };
+
+    setInterval(actualizar,1000);
+    actualizar();
+</script>
 </body>
 </html>
