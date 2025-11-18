@@ -91,7 +91,7 @@
 
 <div id="secondary"></div>
 
-<div id="themeBtn">Moon</div>
+<div id="themeBtn">🌒</div>
 
 <div id="hamburger">
     <div class="bar"></div>
@@ -296,7 +296,7 @@
     }
 
     // UI
-    themeBtn.onclick = e => { e.stopPropagation(); document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light') ? 'Sun' : 'Moon'; };
+    themeBtn.onclick = e => { e.stopPropagation(); document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light') ? '🌞' : '🌒'; };
     function toggleMenu() { hamburger.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('open'); }
     hamburger.onclick = e => { e.stopPropagation(); toggleMenu(); };
     overlay.onclick = () => { if (sidebar.classList.contains('open')) toggleMenu(); };
