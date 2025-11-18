@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Reloj Casio PERFECTO - Voz 12h/24h Corregida</title>
+    <title>Reloj Casio ULTIMATE - Voz 12h PERFECTA</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@flaticon/flaticon-uicons/css/all/all.css">
     <style>
@@ -16,10 +16,7 @@
         }
         body.light{background:#f8f8f8;color:#000}
 
-        #reloj{
-            font-size:18vw;font-weight:800;letter-spacing:0.06em;
-            text-shadow:0 0 50px #00ff41;user-select:none;
-        }
+        #reloj{font-size:18vw;font-weight:800;letter-spacing:0.06em;text-shadow:0 0 50px #00ff41;user-select:none;}
         @media (min-width:500px){#reloj{font-size:15vw}}
         @media (min-width:800px){#reloj{font-size:12vw}}
         body.light #reloj{text-shadow:0 0 50px #000;color:#000}
@@ -30,29 +27,13 @@
         @keyframes flashColon{0%,100%{opacity:1}50%{opacity:0}}
         .flash .puntos{animation:flashColon 0.4s ease-in-out 10 alternate}
 
-        #secondary{
-            margin-top:20px;font-size:5vw;font-weight:600;opacity:0.8;
-            text-align:center;transition:all .4s;min-height:40px;
-        }
+        #secondary{margin-top:20px;font-size:5vw;font-weight:600;opacity:0.8;text-align:center;transition:all .4s;min-height:40px;}
         @media (min-width:600px){#secondary{font-size:3.5vw}}
 
-        #themeBtn{
-            position:fixed;top:18px;left:18px;z-index:100;
-            font-size:1.8rem;cursor:pointer;
-            width:44px;height:44px;border-radius:50%;
-            background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);
-            display:flex;align-items:center;justify-content:center;
-            transition:all .3s;box-shadow:0 0 20px rgba(0,255,65,0.3);
-        }
+        #themeBtn{position:fixed;top:18px;left:18px;z-index:100;font-size:1.8rem;cursor:pointer;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(0,255,65,0.3);}
         body.light #themeBtn{background:rgba(0,0,0,0.12);box-shadow:0 0 20px rgba(0,0,0,0.3)}
 
-        #hamburger{
-            position:fixed;top:18px;right:18px;z-index:100;
-            width:44px;height:44px;display:flex;flex-direction:column;justify-content:center;align-items:center;
-            cursor:pointer;gap:5px;padding:8px;border-radius:50%;
-            background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);
-            box-shadow:0 0 20px rgba(0,255,65,0.3);
-        }
+        #hamburger{position:fixed;top:18px;right:18px;z-index:100;width:44px;height:44px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;gap:5px;padding:8px;border-radius:50%;background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);box-shadow:0 0 20px rgba(0,255,65,0.3);}
         body.light #hamburger{background:rgba(0,0,0,0.12);box-shadow:0 0 20px rgba(0,0,0,0.3)}
         .bar{width:26px;height:4px;background:#00ff41;border-radius:3px;transition:all .3s}
         body.light .bar{background:#000}
@@ -155,7 +136,7 @@
     let alarmas = [];
     let timerActivo = false, timerPausado = false, timerSegundosRestantes = 0, timerInterval = null;
 
-    // === FUNCIÓN PARA DECIR LA HORA EN ESPAÑOL NATURAL (12h/24h) ===
+    // VOZ 100% NATURAL EN ESPAÑOL (12h y 24h)
     function decirHora() {
         const ahora = new Date();
         const h24 = ahora.getHours();
@@ -164,18 +145,25 @@
         let texto = "";
 
         if (es24h) {
+            // Formato 24h
             if (m === 0) texto = `Son las ${h24} en punto`;
-            else if (m === 1) texto = `Es la ${h24} y un minuto`;
+            else if (m === 1) texto = `Son las ${h24} y un minuto`;
             else texto = `Son las ${h24} y ${m}`;
         } else {
+            // Formato 12h con mañana/tarde/noche
             let h12 = h24 % 12 || 12;
-            let periodo = h24 < 12 ? "de la mañana" : h24 < 21 ? "de la tarde" : "de la noche";
+            let periodo = h24 < 12 ? "de la mañana" :
+                         h24 < 18 ? "de la tarde" : "de la noche";
 
             if (h24 === 0 && m === 0) texto = "Es medianoche";
             else if (h24 === 12 && m === 0) texto = "Es mediodía";
-            else if (m === 0) texto = h12 === 1 ? `Es la una en punto ${periodo}` : `Son las ${h12} en punto ${periodo}`;
-            else if (m === 1) texto = h12 === 1 ? `Es la una y un minuto ${periodo}` : `Son las ${h12} y un minuto ${periodo}`;
-            else texto = h12 === 1 ? `Es la una y ${m} ${periodo}` : `Son las ${h12} y ${m} ${periodo}`;
+            else if (m === 0) {
+                texto = h12 === 1 ? `Es la una en punto ${periodo}` : `Son las ${h12} en punto ${periodo}`;
+            } else if (m === 1) {
+                texto = h12 === 1 ? `Es la una y un minuto ${periodo}` : `Son las ${h12} y un minuto ${periodo}`;
+            } else {
+                texto = h12 === 1 ? `Es la una y ${m} ${periodo}` : `Son las ${h12} y ${m} ${periodo}`;
+            }
         }
 
         hablar(texto);
@@ -188,7 +176,7 @@
         speechSynthesis.speak(u);
     }
 
-    // === RESTO DEL CÓDIGO (todo igual, solo corregida la voz) ===
+    // Resto del código (todo funciona igual)
     themeBtn.onclick = e => {
         e.stopPropagation();
         document.body.classList.toggle('light');
@@ -209,8 +197,6 @@
         if (sidebar.classList.contains('open')) return;
         decirHora();
     };
-
-    // Alarmas, temporizador, reloj... (todo igual que en la versión anterior)
 
     document.getElementById('addAlarm').onclick = () => {
         if (alarmas.length >= 3) return alert("Máximo 3 alarmas");
@@ -238,7 +224,6 @@
         actualizarSecondary();
     };
 
-    // Temporizador (igual, con parpadeo y sonido)
     document.getElementById('startTimer').onclick = () => {
         const h = parseInt(document.getElementById('timerH').value)||0;
         const m = parseInt(document.getElementById('timerM').value)||0;
