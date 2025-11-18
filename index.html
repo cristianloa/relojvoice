@@ -2,109 +2,269 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reloj JetBrains Mono – Minutos perfectos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reloj Casio ÉPICO</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
     <style>
-        body{margin:0;height:100vh;background:#000;color:#00ff41;font-family:'JetBrains Mono',monospace;display:flex;justify-content:center;align-items:center;overflow:hidden;cursor:pointer}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{
+            margin:0;height:100dvh;background:#000;color:#00ff41;
+            font-family:'JetBrains Mono',monospace;
+            display:flex;flex-direction:column;justify-content:center;align-items:center;
+            overflow:hidden;position:relative;touch-action:manipulation;
+        }
         body.light{background:#f8f8f8;color:#000}
-        #reloj{font-size:16.8vw;font-weight:800;letter-spacing:0.07em;text-shadow:0 0 45px #00ff41;user-select:none}
-        body.light #reloj{text-shadow:0 0 45px #000}
+
+        #reloj{
+            font-size:18vw;font-weight:800;letter-spacing:0.06em;
+            text-shadow:0 0 50px #00ff41;user-select:none;
+        }
+        @media (min-width:500px){#reloj{font-size:15vw}}
+        @media (min-width:800px){#reloj{font-size:12vw}}
+        body.light #reloj{text-shadow:0 0 50px #000}
+
         .digito{display:inline-block;width:0.59em;text-align:center}
         .puntos{display:inline-block;width:0.5em;text-align:center;animation:parpadeo 1s steps(2,start) infinite}
         @keyframes parpadeo{to{opacity:0}}
-        .controles{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;opacity:0;transition:opacity .4s;z-index:10}
-        body:hover .controles{opacity:0.7}.controles:hover{opacity:1!important}
-        .btn{background:rgba(0,255,65,.15);color:#00ff41;border:1px solid #00ff41;padding:8px 12px;font-family:inherit;font-size:.9rem;cursor:pointer;backdrop-filter:blur(4px);min-width:160px;text-align:center}
-        body.light .btn{background:rgba(0,0,0,.1);color:#000;border-color:#000}
-        .btn.on{background:rgba(0,255,65,.45)!important}
-        body.light .btn.on{background:rgba(0,0,0,.35)!important}
+
+        /* Parpadeo de alarma/temporizador terminado (5 veces) */
+        @keyframes flashColon {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .flash .puntos { animation: flashColon 0.4s ease-in-out 10 alternate; } /* 5 veces = 10 alternancias */
+
+        #secondary{
+            margin-top:20px;font-size:5vw;font-weight:600;opacity:0.8;
+            text-align:center;transition:all .4s;min-height:40px;
+        }
+        @media (min-width:600px){#secondary{font-size:3.5vw}}
+
+        #themeBtn{position:fixed;top:20px;left:20px;z-index:100;font-size:2.8rem;cursor:pointer;padding:10px;border-radius:50%;background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);}
+        body.light #themeBtn{background:rgba(0,0,0,0.1)}
+
+        #hamburger{position:fixed;top:20px;right:20px;z-index:100;width:50px;height:50px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;gap:6px;}
+        .bar{width:35px;height:5px;background:#00ff41;border-radius:3px;transition:all .3s}
+        body.light .bar{background:#000}
+        #hamburger.open .bar:nth-child(1){transform:rotate(45deg) translate(8px,8px)}
+        #hamburger.open .bar:nth-child(2){opacity:0}
+        #hamburger.open .bar:nth-child(3){transform:rotate(-45deg) translate(8px,-8px)}
+
+        #overlay{position:fixed;top:0;left:0;width:100%;height:100dvh;background:rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity .35s;z-index:98;}
+        #overlay.open{opacity:1;pointer-events:all}
+
+        #sidebar{position:fixed;top:0;right:-100%;height:100dvh;background:rgba(0,0,0,0.98);padding:80px 30px 30px;overflow-y:auto;transition:right .35s ease;z-index:99;box-shadow:-10px 0 50px rgba(0,255,100,0.4);}
+        body.light #sidebar{background:rgba(255,255,255,0.98);color:#000}
+        @media (min-width:768px){#sidebar{width:50%;max-width:500px;right:-50%}#sidebar.open{right:0}}
+        @media (max-width:767px){#sidebar{width:100%;right:-100%}#sidebar.open{right:0}}
+
+        .seccion{margin:25px 0;padding:20px;background:rgba(0,255,65,.08);border-radius:14px}
+        body.light .seccion{background:rgba(0,0,0,.07)}
+        h3{margin:0 0 20px;font-size:1.5rem;color:#0f8;text-align:center}
+        body.light h3{color:#080}
+
+        .btn{display:block;width:100%;margin:14px 0;padding:18px;background:rgba(0,255,65,.15);border:2px solid #00ff41;border-radius:12px;text-align:center;font-size:1.2rem;cursor:pointer;font-weight:600;transition:all .2s;}
+        body.light .btn{background:rgba(0,0,0,.1);border-color:#000}
+        .btn.on,.btn.add{background:rgba(0,255,65,.7)!important;color:#000}
+        body.light .btn.on{background:rgba(0,0,0,.6)!important;color:#0f0}
+
+        .input-row{display:flex;gap:15px;align-items:center;justify-content:center;margin:20px 0}
+        input[type=number]{width:90px;padding:16px;font-size:1.5rem;background:rgba(0,0,0,0.7);color:#0f0;border:2px solid #0f0;border-radius:12px;text-align:center;font-family:inherit;}
+        body.light input[type=number]{background:rgba(255,255,255,0.9);color:#000;border-color:#000}
+
+        .alarma-item{display:flex;justify-content:space-between;align-items:center;background:rgba(0,255,65,.1);padding:12px;margin:8px 0;border-radius:10px;font-size:1.2rem;}
+        .alarma-item button{background:#f55;color:#fff;border:none;padding:8px 12px;border-radius:8px}
+
+        .pulse{animation:pulse 1.5s infinite}
+        @keyframes pulse{0%,100%{text-shadow:0 0 50px #00ff41}50%{text-shadow:0 0 120px #00ff41,0 0 200px #0f0}}
     </style>
 </head>
 <body>
 
 <div id="reloj">
-    <span class="digito" id="h1">8</span><span class="digito" id="h2">8</span
+    <span class="digito" id="h1">0</span><span class="digito" id="h2">0</span
     ><span class="puntos">:</span
-    ><span class="digito" id="m1">8</span><span class="digito" id="m2">8</span
+    ><span class="digito" id="m1">0</span><span class="digito" id="m2">0</span
     ><span class="puntos">:</span
-    ><span class="digito" id="s1">8</span><span class="digito" id="s2">8</span>
+    ><span class="digito" id="s1">0</span><span class="digito" id="s2">0</span>
 </div>
 
-<div class="controles">
-    <button class="btn on" id="auto">Cada hora: ON</button>
-    <button class="btn on" id="formato">Formato: 24h</button>
-    <button class="btn" id="tema">Tema claro</button>
+<div id="secondary"></div>
+
+<div id="themeBtn">Moon</div>
+
+<div id="hamburger">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+</div>
+
+<div id="overlay"></div>
+
+<div id="sidebar">
+    <div class="seccion">
+        <h3>Reloj</h3>
+        <button class="btn on" id="auto">Cada hora: ON</button>
+        <button class="btn on" id="formato">Formato: 24h</button>
+    </div>
+
+    <div class="seccion">
+        <h3>Alarmas (máx. 3)</h3>
+        <div class="input-row">
+            <input type="number" id="newH" min="0" max="23" value="7">
+            <span style="font-size:2.5rem">:</span>
+            <input type="number" id="newM" min="0" max="59" value="0">
+            <button class="btn add" id="addAlarm">+ Agregar</button>
+        </div>
+        <div id="listaAlarmas"></div>
+    </div>
+
+    <div class="seccion">
+        <h3>Temporizador</h3>
+        <div class="input-row">
+            <input type="number" id="timerH" min="0" value="0"> :
+            <input type="number" id="timerM" min="0" max="59" value="5"> :
+            <input type="number" id="timerS" min="0" max="59" value="0">
+        </div>
+        <button class="btn" id="startTimer">Iniciar</button>
+        <button class="btn" id="pauseTimer" style="display:none">Pausar</button>
+        <button class="btn" id="cancelTimer" style="display:none">Cancelar</button>
+    </div>
 </div>
 
 <script>
     const h1 = document.getElementById('h1'), h2 = document.getElementById('h2');
     const m1 = document.getElementById('m1'), m2 = document.getElementById('m2');
     const s1 = document.getElementById('s1'), s2 = document.getElementById('s2');
+    const reloj = document.getElementById('reloj');
+    const secondary = document.getElementById('secondary');
+    const themeBtn = document.getElementById('themeBtn');
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const listaAlarmas = document.getElementById('listaAlarmas');
 
-    let es24h = true;
-    let autoOn = true;
+    let es24h = true, autoOn = true;
+    let alarmas = [];
+    let timerActivo = false, timerPausado = false, timerSegundosRestantes = 0, timerInterval = null;
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const gainNode = audioCtx.createGain();
-    gainNode.gain.value = 4.5;
-    gainNode.connect(audioCtx.destination);
+    // === TEMPORIZADOR CON PANTALLA GRANDE ===
+    document.getElementById('startTimer').onclick = () => {
+        const h = parseInt(document.getElementById('timerH').value)||0;
+        const m = parseInt(document.getElementById('timerM').value)||0;
+        const s = parseInt(document.getElementById('timerS').value)||0;
+        timerSegundosRestantes = h*3600 + m*60 + s;
+        if (timerSegundosRestantes <= 0) return;
 
-    // Números en palabras (perfecto español)
-    const unidades = ['cero', 'una', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve',
-                      'diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve'];
-    const decenas = ['', 'diez', 'veinte', 'treinta', 'cuarenta', 'cincuenta'];
+        timerActivo = true;
+        document.getElementById('startTimer').style.display = 'none';
+        document.getElementById('pauseTimer').style.display = 'block';
+        document.getElementById('cancelTimer').style.display = 'block';
 
-    function numeroEnPalabras(n) {
-        if (n === 0) return 'cero';
-        if (n <= 19) return unidades[n];
-        if (n % 10 === 0) return decenas[n/10];
-        return decenas[Math.floor(n/10)] + ' y ' + unidades[n%10];
-    }
+        timerInterval = setInterval(() => {
+            if (timerPausado) return;
 
-    function hablar(fecha) {
-        const h24 = fecha.getHours();
-        const min = fecha.getMinutes();
+            if (--timerSegundosRestantes <= 0) {
+                clearInterval(timerInterval);
+                timerActivo = false;
 
-        let texto = '';
+                // EFECTO FINAL ÉPICO
+                secondary.textContent = "¡TERMINADO!";
+                secondary.style.fontSize = "7vw";
+                secondary.style.opacity = "1";
+                reloj.classList.add('flash'); // Activa el parpadeo de los :
 
-        if (es24h) {
-            // Formato 24h
-            if (h24 === 0 && min === 0) texto = 'Son las cero en punto';
-            else if (min === 0) texto = 'Son las ' + numeroEnPalabras(h24) + ' en punto';
-            else texto = 'Son las ' + numeroEnPalabras(h24) + ' y ' + numeroEnPalabras(min) + (min === 1 ? ' minuto' : ' minutos');
-        } else {
-            // Formato 12h
-            let h12 = h24 % 12; if (h12 === 0) h12 = 12;
-            const periodo = h24 < 12 ? 'de la mañana' : h24 < 21 ? 'de la tarde' : 'de la noche';
+                hablar("¡Temporizador terminado!");
+                if ("vibrate" in navigator) navigator.vibrate([1000, 500, 1000, 500, 1000]);
 
-            if (h24 === 0 && min === 0) texto = 'Es medianoche';
-            else if (h24 === 12 && min === 0) texto = 'Es mediodía';
-            else {
-                const horaTexto = (h12 === 1 ? 'la una' : numeroEnPalabras(h12));
-                if (min === 0) texto = (h12 === 1 ? 'Es ' : 'Son las ') + horaTexto + ' en punto';
-                else texto = (h12 === 1 ? 'Es ' : 'Son las ') + horaTexto + ' y ' + numeroEnPalabras(min) + (min === 1 ? ' minuto' : ' minutos');
-                if (h24 !== 0 && h24 !== 12) texto += ' ' + periodo;
+                setTimeout(() => {
+                    reloj.classList.remove('flash');
+                    secondary.textContent = "";
+                    secondary.style.fontSize = "5vw";
+                    document.getElementById('startTimer').style.display = 'block';
+                    document.getElementById('pauseTimer').style.display = 'none';
+                    document.getElementById('cancelTimer').style.display = 'none';
+                    actualizarSecondary();
+                }, 5000); // 5 segundos de celebración
+                return;
             }
+
+            // Mostrar temporizador grande mientras corre
+            const hh = Math.floor(timerSegundosRestantes/3600).toString().padStart(2,'0');
+            const mm = Math.floor((timerSegundosRestantes%3600)/60).toString().padStart(2,'0');
+            const ss = (timerSegundosRestantes%60).toString().padStart(2,'0');
+            secondary.textContent = `${hh}:${mm}:${ss}`;
+            secondary.style.fontSize = "7vw";
+            secondary.style.opacity = "0.9";
+        }, 1000);
+    };
+
+    document.getElementById('pauseTimer').onclick = () => {
+        timerPausado = !timerPausado;
+        document.getElementById('pauseTimer').textContent = timerPausado ? 'Reanudar' : 'Pausar';
+    };
+
+    document.getElementById('cancelTimer').onclick = () => {
+        clearInterval(timerInterval);
+        timerActivo = false;
+        secondary.textContent = "";
+        document.getElementById('startTimer').style.display = 'block';
+        document.getElementById('pauseTimer').style.display = 'none';
+        document.getElementById('cancelTimer').style.display = 'none';
+        actualizarSecondary();
+    };
+
+    // === ALARMAS (hasta 3) ===
+    document.getElementById('addAlarm').onclick = () => {
+        if (alarmas.length >= 3) return alert("Máximo 3 alarmas");
+        const h = parseInt(document.getElementById('newH').value) || 0;
+        const m = parseInt(document.getElementById('newM').value) || 0;
+        alarmas.push({h, m, id: Date.now()});
+        renderAlarmas();
+        actualizarSecondary();
+    };
+
+    function renderAlarmas() {
+        listaAlarmas.innerHTML = '';
+        alarmas.forEach(a => {
+            const div = document.createElement('div');
+            div.className = 'alarma-item';
+            div.innerHTML = `Alarma ${a.h.toString().padStart(2,'0')}:${a.m.toString().padStart(2,'0')} <button onclick="eliminarAlarma(${a.id})">Eliminar</button>`;
+            listaAlarmas.appendChild(div);
+        });
+    }
+    window.eliminarAlarma = id => {
+        alarmas = alarmas.filter(a => a.id !== id);
+        renderAlarmas();
+        actualizarSecondary();
+    };
+
+    function actualizarSecondary() {
+        if (timerActivo) return;
+        if (alarmas.length === 0) { secondary.textContent = ''; return; }
+        const ahora = new Date();
+        const actualMin = ahora.getHours() * 60 + ahora.getMinutes();
+        let menorDiff = 1440;
+        let proxima = null;
+        alarmas.forEach(a => {
+            const diff = (a.h * 60 + a.m - actualMin + 1440) % 1440;
+            if (diff < menorDiff) { menorDiff = diff; proxima = a; }
+        });
+        if (proxima && menorDiff < 1440) {
+            const hh = Math.floor(menorDiff / 60).toString().padStart(2,'0');
+            const mm = (menorDiff % 60).toString().padStart(2,'0');
+            secondary.textContent = `Alarma ${proxima.h}:${proxima.m.toString().padStart(2,'0')} en ${hh}:${mm}`;
+            secondary.style.fontSize = "5vw";
         }
-
-        texto += '.';
-
-        const u = new SpeechSynthesisUtterance(texto);
-        const voces = speechSynthesis.getVoices();
-        const voz = voces.find(v => v.lang === 'es-ES' && (v.name.includes('Monica') || v.name.includes('Carlos')))
-                 || voces.find(v => v.lang.startsWith('es'));
-        if (voz) u.voice = voz;
-        u.rate = 0.88;
-        u.onstart = () => audioCtx.resume();
-        speechSynthesis.speak(u);
     }
 
-    function actualizar() {
+    // === RELOJ + ALARMAS ===
+    function actualizarReloj() {
         const ahora = new Date();
-        const h24 = ahora.getHours();
-        const h = es24h ? h24 : (h24 % 12 || 12);
-        const hh = h.toString().padStart(2,'0');
+        let horas = ahora.getHours();
+        if (!es24h) horas = horas % 12 || 12;
+
+        const hh = horas.toString().padStart(2,'0');
         const mm = ahora.getMinutes().toString().padStart(2,'0');
         const ss = ahora.getSeconds().toString().padStart(2,'0');
 
@@ -112,34 +272,51 @@
         m1.textContent = mm[0]; m2.textContent = mm[1];
         s1.textContent = ss[0]; s2.textContent = ss[1];
 
-        if (autoOn && mm === '00' && ss === '00') hablar(ahora);
+        if (autoOn && mm === '00' && ss === '00') hablar(`Son las ${ahora.getHours()} en punto`);
+
+        // Chequear alarmas
+        alarmas.forEach(a => {
+            if (a.h === ahora.getHours() && a.m === ahora.getMinutes() && ahora.getSeconds() === 0) {
+                secondary.textContent = `¡ALARMA! ${a.h}:${a.m.toString().padStart(2,'0')}`;
+                secondary.style.fontSize = "7vw";
+                reloj.classList.add('flash');
+                hablar("¡Alarma!");
+                if ("vibrate" in navigator) navigator.vibrate([500,300,500,300,500]);
+                setTimeout(() => reloj.classList.remove('flash'), 5000);
+            }
+        });
+
+        if (!timerActivo) actualizarSecondary();
     }
 
-    // Clic en cualquier parte = dice la hora
-    document.body.addEventListener('click', (e) => {
-        if (!e.target.closest('.controles')) {
-            hablar(new Date());
+    function hablar(texto) {
+        const u = new SpeechSynthesisUtterance(texto);
+        u.lang = 'es-ES'; u.rate = 0.9;
+        speechSynthesis.speak(u);
+    }
+
+    // UI
+    themeBtn.onclick = e => { e.stopPropagation(); document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light') ? 'Sun' : 'Moon'; };
+    function toggleMenu() { hamburger.classList.toggle('open'); sidebar.classList.toggle('open'); overlay.classList.toggle('open'); }
+    hamburger.onclick = e => { e.stopPropagation(); toggleMenu(); };
+    overlay.onclick = () => { if (sidebar.classList.contains('open')) toggleMenu(); };
+
+    document.body.onclick = e => {
+        if (!e.target.closest('#sidebar') && !e.target.closest('#hamburger') && !e.target.closest('#themeBtn') && !sidebar.classList.contains('open')) {
+            hablar(`Son las ${new Date().getHours()} y ${new Date().getMinutes()}`);
         }
-    });
-
-    document.getElementById('auto').onclick = (e) => { e.stopPropagation(); autoOn = !autoOn;
-        const b = document.getElementById('auto'); b.classList.toggle('on', autoOn);
-        b.textContent = `Cada hora: ${autoOn?'ON':'OFF'}`;
     };
 
-    document.getElementById('formato').onclick = (e) => { e.stopPropagation(); es24h = !es24h;
-        document.getElementById('formato').classList.toggle('on', es24h);
+    document.getElementById('formato').onclick = () => {
+        es24h = !es24h;
+        document.getElementById('formato').classList.toggle('on');
         document.getElementById('formato').textContent = `Formato: ${es24h?'24h':'12h'}`;
-        actualizar();
+        actualizarReloj();
     };
 
-    document.getElementById('tema').onclick = (e) => { e.stopPropagation();
-        document.body.classList.toggle('light');
-        document.getElementById('tema').textContent = document.body.classList.contains('light')?'Tema oscuro':'Tema claro';
-    };
-
-    setInterval(actualizar,1000);
-    actualizar();
+    setInterval(actualizarReloj, 1000);
+    actualizarReloj();
+    renderAlarmas();
 </script>
 </body>
 </html>
